@@ -19,7 +19,7 @@ dbconnect(process.env.MONGO_KEY);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "images")));
 routes(app);
-app.post("/api/v1/order/webhook", paypalWebhook);
+app.post("/api/v1/webhook", paypalWebhook);
 app.all("*", (req, res, next) => {
   next(new AppError(`can't find this route ${req.originalUrl}`, 404));
 });
