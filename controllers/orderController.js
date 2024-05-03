@@ -39,63 +39,6 @@ const paypalToken = async () => {
   }
 };
 
-const verifyWebhookSignature = (
-  publicKey,
-  authAlgo,
-  transmissionId,
-  actualSignature,
-  requestBody
-) => {
-  const verifier = crypto.createVerify(authAlgo);
-  verifier.update(`${transmissionId} | ${requestBody}`);
-  return verifier.verify(publicKey, actualSignature, "base64");
-};
-
-const fetchPayPalCert = async (certUrl) => {
-  try {
-    const response = await axios.get(certUrl);
-    return response.data;
-  } catch (error) {
-    throw new Error("Error fetching PayPal public certificate");
-  }
-};
-
-const webhook = async (req, res) => {
-  const headers = req.headers;
-  const body = JSON.stringify(req.body);
-
-  // Retrieve signature details from headers
-  const authAlgo = headers["paypal-auth-algo"];
-  const transmissionId = headers["paypal-transmission-id"];
-  const certUrl = headers["paypal-cert-url"];
-  const actualSignature = headers["paypal-transmission-sig"];
-
-  try {
-    // Fetch PayPal's public certificate
-    const publicKey = await fetchPayPalCert(certUrl);
-
-    // Verify the webhook signature
-    const isVerified = verifyWebhookSignature(
-      publicKey,
-      authAlgo,
-      transmissionId,
-      actualSignature,
-      body
-    );
-
-    if (isVerified) {
-      console.log("Webhook signature verified");
-      // Process the webhook payload here
-      res.status(200).send("Webhook signature verified");
-    } else {
-      console.error("Webhook signature verification failed");
-      res.status(400).send("Webhook signature verification failed");
-    }
-  } catch (error) {
-    console.error("Error handling webhook:", error);
-    res.status(500).send("Error handling webhook");
-  }
-};
 exports.createCardOrder = expressAsyncHandler(async (req, res, next) => {
   paypal.configure({
     mode: "sandbox", // or 'live' for production
@@ -139,29 +82,31 @@ exports.createCardOrder = expressAsyncHandler(async (req, res, next) => {
 });
 
 exports.paypalWebhook = expressAsyncHandler(async (req, res, next) => {
-  webhook(req, res);
   const signature = req.headers["paypal-transmission-sig"];
-  const webhookId = req.headers["paypal-webhook-id"];
   const body = JSON.stringify(req.body);
-  const accessToken = await paypalToken();
-  console.log(accessToken);
+  const accessToken = await paypalToken(); // Your function to obtain PayPal access token
+
   try {
+    // Fetch PayPal's public key
     const response = await fetch(
-      `https://api.sandbox.paypal.com/v1/notifications/webhooks-events/${webhookId}`,
+      "https://api.sandbox.paypal.com/v1/notifications/webhooks-public-keys",
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       }
     );
+
     if (!response.ok) {
-      throw new AppError(
-        "Failed to fetch PayPal public key",
-        response.statusText
-      );
+      throw new Error("Failed to fetch PayPal public keys");
     }
 
-    const { public_key: publicKey } = await response.json();
+    const { keys } = await response.json();
+
+    // Find the public key corresponding to the webhook signature
+    const publicKey = keys.find(
+      (key) => key.key_id === req.headers["paypal-webhook-id"]
+    ).public_key;
 
     // Verify signature
     const verifier = crypto.createVerify("sha256");
