@@ -57,7 +57,7 @@ exports.createCardOrder = expressAsyncHandler(async (req, res, next) => {
       },
     },
     redirect_urls: {
-      return_url: `${req.protocol}://${req.get("host")}/order`,
+      return_url: `https://egypt-tours-backend.onrender.com/api/v1/order/webhook`,
       cancel_url: "http://localhost:3000/cancel",
     },
     transactions: [
