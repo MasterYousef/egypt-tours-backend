@@ -6,7 +6,6 @@ const dbconnect = require("./config/dbconnect");
 const AppError = require("./config/appError");
 const globalError = require("./middlewares/errorHandler");
 const routes = require("./utils");
-const { paypalWebhook } = require("./controllers/orderController");
 
 const app = express();
 dotenv.config({ path: "config.env" });
@@ -19,7 +18,6 @@ dbconnect(process.env.MONGO_KEY);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "images")));
 routes(app);
-app.get("/api/v1/webhook", paypalWebhook);
 app.all("*", (req, res, next) => {
   next(new AppError(`can't find this route ${req.originalUrl}`, 404));
 });
