@@ -34,3 +34,12 @@ exports.createOrder = [
     }),
   validationMiddleWare,
 ];
+
+exports.checkOrderId = [
+  check("id")
+    .notEmpty()
+    .withMessage("order ID required")
+    .isMongoId()
+    .withMessage("order id is not valid"),
+  validationMiddleWare,
+];

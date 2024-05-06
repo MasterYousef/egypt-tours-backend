@@ -45,7 +45,7 @@ exports.getOne = (model) =>
   expressAsyncHandler(async (req, res, next) => {
     const data = await model.findOne({ _id: req.params.id });
     if (!data) {
-      next(new AppError("No product found", 404));
+      next(new AppError("No data found", 404));
     }
     res.status(200).json({ status: "success", data });
   });

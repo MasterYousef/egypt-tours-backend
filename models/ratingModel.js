@@ -52,7 +52,6 @@ schema.post("save",async function(){
 })
 
 schema.post("findOneAndUpdate",async (doc) =>{
-  console.log("a7a");
   await doc.constructor.tourRatingAverageAndQuantity(doc.tour)
  })
 

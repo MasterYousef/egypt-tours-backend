@@ -4,6 +4,23 @@ const MainController = require("./mainController");
 const order = require("../models/orderModel");
 const AppError = require("../config/appError");
 
+exports.getOrders = MainController.getAll(order);
+
+exports.deleteOrder = MainController.deleteOne(order);
+
+exports.getOrder = MainController.getOne(order);
+
+exports.setIsPaid = expressAsyncHandler(async (req, res, next) => {
+  const data = await order.findByIdAndUpdate(
+    req.params.id,
+    { ispaid: true },
+    {
+      new: true,
+    }
+  );
+  res.status(200).json({ status: "success", data });
+});
+
 exports.createCashOrder = MainController.postOne(order);
 
 exports.createCardOrder = expressAsyncHandler(async (req, res, next) => {
