@@ -2,10 +2,14 @@ const express = require("express");
 const path = require("path");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const helmet = require("helmet");
+const cors = require("cors");
+const cookieParser = require('cookie-parser')
 const dbconnect = require("./config/dbconnect");
 const AppError = require("./config/appError");
 const globalError = require("./middlewares/errorHandler");
 const routes = require("./utils");
+
 
 const app = express();
 dotenv.config({ path: "config.env" });
@@ -15,6 +19,12 @@ if (process.env.NODE_ENV === "development") {
   console.log(`app work on ${process.env.NODE_ENV}`);
 }
 dbconnect(process.env.MONGO_KEY);
+app.use(helmet());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true, 
+}))
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "images")));
 routes(app);

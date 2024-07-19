@@ -9,19 +9,22 @@ router.get("/", controller.getratings);
 
 router.use(protect);
 
+router.delete("/admin/:id",permissions("admin"), validator.checkRateId, controller.deleteRate);
+
+router.use(permissions("user"));
+
 router
   .route("/:id")
-  .put(permissions("admin"),validator.updateRate, controller.updateRate)
-  .delete(permissions("user"),validator.checkRateId, controller.deleteUserRate);
+  .put(controller.setUserId,validator.updateRate, controller.updateRate)
+  .delete(controller.setUserId,validator.checkRateId, controller.deleteUserRate);
 
 router.post(
   "/",
-  permissions("admin"),
   controller.setUserId,
   validator.postRate,
   controller.postRate
 );
 
-router.delete("/admin/:id",permissions("admin"), validator.checkRateId, controller.deleteRate);
+
 
 module.exports = router;

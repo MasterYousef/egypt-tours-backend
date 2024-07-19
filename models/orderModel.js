@@ -20,12 +20,6 @@ const schema = new mongoose.Schema({
     type: String,
     ref: "coupon",
   },
-  payment: {
-    type: String,
-    required: [true, "payment method is required"],
-    enum: ["cash", "card"],
-    default: "cash",
-  },
   ispaid: {
     type: Boolean,
     default: false,

@@ -21,8 +21,6 @@ exports.setIsPaid = expressAsyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data });
 });
 
-exports.createCashOrder = MainController.postOne(order);
-
 exports.createCardOrder = expressAsyncHandler(async (req, res, next) => {
   paypal.configure({
     mode: "sandbox", // or 'live' for production
@@ -81,14 +79,12 @@ exports.paypalWebhook = expressAsyncHandler(async (req, res, next) => {
   });
   paypal.payment.get(paymentId, async (error, payment) => {
     if (error) {
-      console.log(error);
       next(new AppError("'Error retrieving payment details", 404));
     } else {
       const custom = JSON.parse(payment.transactions[0].custom);
-      const data = await order.create({
+      await order.create({
         tour: custom.tour,
         user: custom.user,
-        payment: "card",
         ispaid: true,
         price: payment.transactions[0].amount.total,
       });

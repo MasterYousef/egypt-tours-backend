@@ -39,17 +39,16 @@ exports.resizeMultiImages = async (req, res, next, name) => {
     req.body.imageCover = fileName;
   }
   if (req.files.images) {
-    const data = await Promise.all(
+     await Promise.all(
       req.files.images.map(async (e) => {
         const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
         await sharp(e.buffer)
           .resize(700, 700)
           .toFormat("jpeg")
           .toFile(`images/${name}/${fileName}`);
-        return fileName;
+        req.body.images.push(fileName)
       })
     );
-    req.body.images = data;
   }
   next();
 };
@@ -60,13 +59,15 @@ exports.imageModelOptions = (options, file) => {
       const imgUrl = `${process.env.BASE_URL}/${file}/${doc.image}`;
       doc.image = imgUrl;
     }
-    if (doc.imageCover){
+    if (doc.imageCover && !doc.imageCover.startsWith(`${process.env.BASE_URL}`)){
       const imgUrl = `${process.env.BASE_URL}/${file}/${doc.imageCover}`;
       doc.imageCover = imgUrl;
     }
     if(doc.images){
       const data = doc.images.map((e) => {
-        e = `${process.env.BASE_URL}/${file}/${e}`;
+        if(!e.startsWith(`${process.env.BASE_URL}`)){
+          e = `${process.env.BASE_URL}/${file}/${e}`;
+        }
         return e;
       });
       doc.images = data;

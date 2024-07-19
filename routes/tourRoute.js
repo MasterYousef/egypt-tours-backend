@@ -10,7 +10,7 @@ router.get("/", controller.getTours);
 
 router.get("/:id", validator.checkTourId, controller.getTour);
 
-router.use("/:tourId/ratings", ratingRoute);
+router.use("/:tour/ratings", ratingRoute);
 
 router.use(protect, permissions("admin"));
 

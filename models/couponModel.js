@@ -5,8 +5,8 @@ const schema = new mongoose.Schema({
     type: String,
     unique: true,
     required: [true, "coupon name is required"],
-    maxlenght: [30, "coupon name must be less than 30 characters"],
-    minlenght: [2, "coupon name must be more than 2 characters"],
+    maxlenght: [30, "coupon name must be less than 30 letters"],
+    minlenght: [2, "coupon name must be more than 2 letters"],
   },
   discount: {
     type: Number,

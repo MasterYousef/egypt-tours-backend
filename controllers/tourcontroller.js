@@ -16,13 +16,24 @@ exports.updateTour = expressAsyncHandler(async (req, res, next) => {
   if (!data) {
     next(new AppError("id is not valid", 404));
   }
-  const image = data.imageCover.replace(`${process.env.BASE_URL}/`, "");
-  fs.unlinkSync(`images/${image}`);
+  if(req.body.imageCover){
+    const image = data.imageCover.replace(`${process.env.BASE_URL}/`, "");
+    fs.unlinkSync(`images/${image}`);
+  }
+
+  if(req.body.images){
+      data.images.forEach((im)=>{
+        if(!req.body.images.includes(im)){
+          const image = im.replace(`${process.env.BASE_URL}/`, "");
+          fs.unlinkSync(`images/${image}`);
+        }
+      })
+  }
   const entries = Object.entries(req.body);
   entries.forEach(([key, value]) => {
     data[key] = req.body[key]
   });
-  data.save()
+  await data.save()
   res.status(200).json({status:"success",data})
 });
 
@@ -30,7 +41,7 @@ exports.getTour = MainController.getOne(tour);
 exports.deleteTour = MainController.deleteOne(tour);
 exports.tourImageHandler = multiImagesHandler([
   { name: "imageCover", maxCount: 1 },
-  { name: "imageCover", maxCount: 5 },
+  { name: "images", maxCount: 5 },
 ]);
 exports.resizeTourImages = expressAsyncHandler((req, res, next) =>
   resizeMultiImages(req, res, next, "tour")

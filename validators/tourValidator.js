@@ -6,17 +6,17 @@ exports.postTour = [
   check("title")
     .notEmpty()
     .withMessage("tour title is required")
-    .isLength({ max: 35 })
-    .withMessage("tour max length is 35 characters")
+    .isLength({ max: 25 })
+    .withMessage("tour max length is 25 letters")
     .isLength({ min: 3 })
-    .withMessage("tour minimum length is 3 characters"),
+    .withMessage("tour minimum length is 3 letters"),
   check("description")
     .notEmpty()
     .withMessage("tour description is required")
     .isLength({ max: 255 })
-    .withMessage("tour max length is 255 characters")
+    .withMessage("tour max length is 255 letters")
     .isLength({ min: 10 })
-    .withMessage("tour minimum length is 10 characters"),
+    .withMessage("tour minimum length is 10 letters"),
   check("imageCover").notEmpty().withMessage("tour image Cover is required"),
   check("images")
     .optional()
@@ -69,18 +69,18 @@ exports.updateTour = [
     .optional()
     .notEmpty()
     .withMessage("tour title is required")
-    .isLength({ max: 35 })
-    .withMessage("tour max length is 35 characters")
+    .isLength({ max: 25 })
+    .withMessage("tour max length is 25 letters")
     .isLength({ min: 3 })
-    .withMessage("tour minimum length is 3 characters"),
+    .withMessage("tour minimum length is 3 letters"),
   check("description")
     .optional()
     .notEmpty()
     .withMessage("tour description is required")
     .isLength({ max: 255 })
-    .withMessage("tour max length is 255 characters")
+    .withMessage("tour max length is 255 letters")
     .isLength({ min: 10 })
-    .withMessage("tour minimum length is 10 characters"),
+    .withMessage("tour minimum length is 10 letters"),
   check("imageCover")
     .optional()
     .notEmpty()

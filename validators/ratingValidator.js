@@ -1,5 +1,6 @@
-const { check } = require("express-validator");
+const { check, body } = require("express-validator");
 const validationMiddleWare = require("../middlewares/validationMiddlewares");
+const rating = require("../models/ratingModel");
 
 exports.postRate = [
   check("tour")
@@ -7,11 +8,18 @@ exports.postRate = [
     .withMessage("rating must belong to tour")
     .isMongoId()
     .withMessage("tour id is not valid"),
-  check("user")
+  body("user")
     .notEmpty()
     .withMessage("rating must belong to user")
     .isMongoId()
-    .withMessage("user id is not valid"),
+    .withMessage("user id is not valid")
+    .custom(async (value, { req }) => {
+      const data = await rating.findOne({ user: value, tour: req.body.tour });
+      if (data) {
+        throw new Error("you already rated this tour");
+      }
+      return true;
+    }),
   check("rate")
     .notEmpty()
     .withMessage("rate is required")
@@ -26,9 +34,9 @@ exports.postRate = [
   check("comment")
     .optional()
     .isLength({ min: 2 })
-    .withMessage("comment characters must be more than 2 characters")
+    .withMessage("comment letters must be more than 2 letters")
     .isLength({ max: 100 })
-    .withMessage("comment characters must be less than 100 characters"),
+    .withMessage("comment letters must be less than 100 letters"),
   validationMiddleWare,
 ];
 
@@ -40,12 +48,19 @@ exports.updateRate = [
     .withMessage("rating must belong to tour")
     .isMongoId()
     .withMessage("tour id is not valid"),
-  check("user")
+  body("user")
     .optional()
     .notEmpty()
     .withMessage("rating must belong to user")
     .isMongoId()
-    .withMessage("user id is not valid"),
+    .withMessage("user id is not valid")
+    .custom(async (value, { req }) => {
+      const data = await rating.findOne({ user: value, tour: req.body.tour });
+      if (data) {
+        throw new Error("you already rated this tour");
+      }
+      return true;
+    }),
   check("rate")
     .optional()
     .notEmpty()
@@ -61,9 +76,9 @@ exports.updateRate = [
   check("comment")
     .optional()
     .isLength({ min: 2 })
-    .withMessage("comment characters must be more than 2 characters")
+    .withMessage("comment letters must be more than 2 letters")
     .isLength({ max: 100 })
-    .withMessage("comment characters must be less than 100 characters"),
+    .withMessage("comment letters must be less than 100 letters"),
   validationMiddleWare,
 ];
 

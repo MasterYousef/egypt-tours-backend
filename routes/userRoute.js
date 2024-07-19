@@ -7,7 +7,18 @@ const router = express.Router();
 
 router.get("/:id",protect,validator.checkUserId, controller.getUser)
 
-router.use(protect, permissions("admin"));
+router.use(protect);
+
+router.put(
+  "/:id",
+  protect,
+  controller.userImageHandler,
+  controller.resizeUserImage,
+  validator.updateUser,
+  controller.updateUser
+);
+
+router.use(permissions("admin"));
 
 router
   .route("/")

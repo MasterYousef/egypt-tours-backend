@@ -6,11 +6,11 @@ class ApiFeatures {
 
   searchfillter() {
     const query = { ...this.query };
-    const skipWords = ["sort", "keyWord", "faild", "limit", "page"];
-    if (query.keyWord) {
+    const skipWords = ["sort", "keyword", "faild", "limit", "page"];
+    if (query.keyword) {
       query.$or = [
-        { title: { $regex: query.keyWord } },
-        { description: { $regex: query.keyWord } },
+        { title: { $regex: query.keyword } },
+        { description: { $regex: query.keyword } },
       ];
     }
     skipWords.map((e) => delete query[e]);

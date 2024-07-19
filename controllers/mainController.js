@@ -1,3 +1,4 @@
+const fs = require("fs");
 const expressAsyncHandler = require("express-async-handler");
 const ApiFeatures = require("../utils/ApiFeatures");
 const AppError = require("../config/appError");
@@ -5,17 +6,26 @@ const AppError = require("../config/appError");
 exports.getAll = (model) =>
   expressAsyncHandler(async (req, res) => {
     let fillter;
-    if (req.params.tourId) {
-      fillter = { tour: req.params.tourId };
+    let mongo = model.find(fillter)
+    if (req.params.tour) {
+      fillter = { tour: req.params.tour };
+      mongo = model.find(fillter).populate("user","_id username image")
     }
-    const apiFeatures = await new ApiFeatures(model.find(fillter), req.query)
+    const apiFeatures = await new ApiFeatures(mongo, req.query)
       .searchfillter()
       .resultSort()
       .selectFailds()
       .paginate();
+    let keyword = {};
+    if (req.query.keyword) {
+      keyword.$or = [
+        { title: { $regex: req.query.keyword } },
+        { description: { $regex: req.query.keyword } },
+      ];
+    }
     const data = await apiFeatures.mongo;
     const result = data.length || 0;
-    const total = await model.countDocuments();
+    const total = await model.countDocuments(keyword);
     const limit = req.query.limit * 1 || 10;
     const page = req.query.page * 1 || 1;
     const paginationResult = {
@@ -36,14 +46,17 @@ exports.getAll = (model) =>
 
 exports.postOne = (Model) =>
   expressAsyncHandler(async (req, res) => {
-    console.log(req.body);
     const data = await Model.create(req.body);
-    res.status(201).json({ data: data });
+    res.status(201).json({ status: "success", data: data });
   });
 
 exports.getOne = (model) =>
   expressAsyncHandler(async (req, res, next) => {
-    const data = await model.findOne({ _id: req.params.id });
+    let fillter = {_id:req.params.id}
+    if(req.params.couponName){
+      fillter = {name:req.params.couponName}
+    }
+    const data = await model.findOne(fillter);
     if (!data) {
       next(new AppError("No data found", 404));
     }
@@ -56,10 +69,29 @@ exports.deleteOne = (model) =>
     res.status(204).send();
   });
 
-exports.updateOne = (model) =>
+exports.updateOne = (model, type) =>
   expressAsyncHandler(async (req, res, next) => {
-    const data = await model.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.status(200).json({ status: "success", data });
+    if (type === "user") {
+      const data = await model.findOne({ _id: req.params.id });
+      if (!data) {
+        next(new AppError("id is not valid", 404));
+      }
+      if (req.body.image) {
+        if (!data.image.endsWith("default.jpeg")) {
+          const image = data.image.replace(`${process.env.BASE_URL}/`, "");
+          fs.unlinkSync(`images/${image}`);
+        }
+      }
+      const entries = Object.entries(req.body);
+      entries.forEach(([key, value]) => {
+        data[key] = req.body[key];
+      });
+      await data.save();
+      res.status(200).cookie("user", data).json({ status: "success", data });
+    } else {
+      const data = await model.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+      });
+      res.status(200).json({ status: "success", data });
+    }
   });

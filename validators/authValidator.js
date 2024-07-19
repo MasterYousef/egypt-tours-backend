@@ -8,14 +8,14 @@ exports.signUp = [
     .notEmpty()
     .withMessage("username is required")
     .isLength({ max: 30 })
-    .withMessage("username max length is 30 characters")
+    .withMessage("username max length is 30 letters")
     .isLength({ min: 2 })
-    .withMessage("username minimum length is 2 characters"),
+    .withMessage("username minimum length is 2 letters"),
   check("password")
     .notEmpty()
     .withMessage("password is required")
     .isLength({ min: 6 })
-    .withMessage("password minimum length is 6 characters"),
+    .withMessage("password minimum length is 6 letters"),
   check("email")
     .notEmpty()
     .withMessage("email is required")
@@ -46,7 +46,7 @@ exports.login = [
     .notEmpty()
     .withMessage("password is required")
     .isLength({ min: 6 })
-    .withMessage("password minimum length is 6 characters"),
+    .withMessage("password minimum length is 6 letters"),
   validationMiddleWare,
 ];
 
@@ -55,12 +55,12 @@ exports.changePassword = [
     .notEmpty()
     .withMessage("password is required")
     .isLength({ min: 6 })
-    .withMessage("password minimum length is 6 characters"),
+    .withMessage("password minimum length is 6 letters"),
   check("newPassword")
     .notEmpty()
     .withMessage("new password is required")
     .isLength({ min: 6 })
-    .withMessage("new password minimum length is 6 characters"),
+    .withMessage("new password minimum length is 6 letters"),
   validationMiddleWare,
 ];
 
@@ -95,10 +95,10 @@ exports.resetPassword = [
     .withMessage("email is required")
     .isEmail()
     .withMessage("email not valid "),
-    check("password")
+  check("password")
     .notEmpty()
     .withMessage("password is required")
     .isLength({ min: 6 })
-    .withMessage("password minimum length is 6 characters"),
+    .withMessage("password minimum length is 6 letters"),
   validationMiddleWare,
 ];

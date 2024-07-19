@@ -5,14 +5,14 @@ const schema = new mongoose.Schema({
   title: {
     required: [true, "tour title is required"],
     type: String,
-    maxlenght: [35, "tour max length is 35 characters"],
-    minlenght: [3, "tour minimum length is 3 characters"],
+    maxlenght: [25, "tour max length is 25 letters"],
+    minlenght: [3, "tour minimum length is 3 letters"],
   },
   description: {
     required: [true, "tour description is required"],
     type: String,
-    maxlenght: [255, "tour max length is 255 characters"],
-    minlenght: [10, "tour minimum length is 10 characters"],
+    maxlenght: [255, "tour max length is 255 letters"],
+    minlenght: [10, "tour minimum length is 10 letters"],
   },
   imageCover: {
     required: [true, "tour image cover is required"],
@@ -37,20 +37,20 @@ const schema = new mongoose.Schema({
     type: Number,
     required: [true, "Number of guides in tour is required"],
   },
-  start:{
+  start: {
     type: Date,
-    required:[true,"tour start date is required"]
+    required: [true, "tour start date is required"],
   },
-  duration:{
+  duration: {
     type: Number,
-    min:[1,"tour duration must be more than one day"],
-    required:[true,"tour duration is required"]
+    min: [1, "tour duration must be more than one day"],
+    required: [true, "tour duration is required"],
   },
   ratingsAverage: Number,
   ratingsQuantity: Number,
 });
 
-imageModelOptions(schema,"tour")
+imageModelOptions(schema, "tour");
 
 const tour = mongoose.model("tour", schema);
 

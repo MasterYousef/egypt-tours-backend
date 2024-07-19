@@ -9,8 +9,6 @@ router.get("/webhook", controller.paypalWebhook);
 
 router.use(protect);
 
-router.post("/cash",permissions("admin") ,validator.createOrder, controller.createCashOrder);
-
 router.post("/card", permissions("user") , validator.createOrder, controller.createCardOrder);
 
 router.use(permissions("admin"))

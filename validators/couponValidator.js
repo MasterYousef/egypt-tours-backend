@@ -7,9 +7,9 @@ exports.postCoupon = [
     .notEmpty()
     .withMessage("coupon name is required")
     .isLength({ min: 2 })
-    .withMessage("coupon name must be more than 2 characters")
+    .withMessage("coupon name must be more than 2 letters")
     .isLength({ max: 30 })
-    .withMessage("coupon name must be less than 30 characters"),
+    .withMessage("coupon name must be less than 30 letters"),
   check("discount")
     .notEmpty()
     .withMessage("coupon discount is required")
@@ -46,9 +46,9 @@ exports.updateCoupon = [
     .notEmpty()
     .withMessage("coupon name is required")
     .isLength({ min: 2 })
-    .withMessage("coupon name must be more than 2 characters")
+    .withMessage("coupon name must be more than 2 letters")
     .isLength({ max: 30 })
-    .withMessage("coupon name must be less than 30 characters"),
+    .withMessage("coupon name must be less than 30 letters"),
   check("discount")
     .optional()
     .notEmpty()
@@ -73,6 +73,11 @@ exports.updateCoupon = [
       }
       return true;
     }),
+  validationMiddleWare,
+];
+
+exports.getCoupon = [
+  check("couponName").notEmpty().withMessage("coupon name is required"),
   validationMiddleWare,
 ];
 

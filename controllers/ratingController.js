@@ -4,7 +4,7 @@ const rating = require("../models/ratingModel");
 const AppError = require("../config/appError");
 
 exports.setUserId = expressAsyncHandler((req, res, next) => {
-  req.body.user = req.user._id;
+  req.body.user = req.user._id.toString();
   next();
 });
 exports.postRate = MainController.postOne(rating);

@@ -4,35 +4,35 @@ const { imageModelOptions } = require("../middlewares/imagesMiddleware");
 const schema = new mongoose.Schema({
   username: {
     type: String,
-    required:[true,"username is required"],
-    maxlenght: [30, "username must be less than 30 characters"],
-    minlenght: [2, "username must be more than 2 characters"],
+    required: [true, "username is required"],
+    maxlenght: [30, "username must be less than 30 letters"],
+    minlenght: [2, "username must be more than 2 letters"],
   },
   email: {
-    type:String,
-    required:[true,"user email is required"],
-    unique:[true,"user email is unique"],
+    type: String,
+    required: [true, "user email is required"],
+    unique: [true, "user email is unique"],
     minlenght: [10, "user email must be grater than 10 character"],
     maxlenght: [100, "user email must be less than 100 character"],
   },
-  password:{
+  password: {
     type: String,
-    required:[true,"user password is required"],
+    required: [true, "user password is required"],
     minlenght: [6, "user password must be grater than 15 character"],
   },
-  image:String,
+  image: String,
   role: {
     type: String,
-    default:"user",
+    default: "user",
     enum: ["user", "admin"],
   },
-  passwordChangeAt:Date,
-  passwordResetToken:Number,
-  passwordResetExpires:Date,
-  passwordReset:Boolean
+  passwordChangeAt: Date,
+  passwordResetToken: Number,
+  passwordResetExpires: Date,
+  passwordReset: Boolean,
 });
 
-imageModelOptions(schema,"user")
+imageModelOptions(schema, "user");
 
 const user = mongoose.model("user", schema);
 
