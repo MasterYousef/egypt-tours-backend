@@ -2,6 +2,7 @@ const fs = require("fs");
 const expressAsyncHandler = require("express-async-handler");
 const ApiFeatures = require("../utils/ApiFeatures");
 const AppError = require("../config/appError");
+const order = require("../models/orderModel");
 
 exports.getAll = (model) =>
   expressAsyncHandler(async (req, res) => {
@@ -10,6 +11,12 @@ exports.getAll = (model) =>
     if (req.params.tour) {
       fillter = { tour: req.params.tour };
       mongo = model.find(fillter).populate("user","_id username image")
+    }
+    if(req.params.user){
+      fillter = { user: req.params.user };
+    }
+    if(model === order){
+      mongo = model.find(fillter).populate("tour","title start duration price imageCover people").populate("user","username email")
     }
     const apiFeatures = await new ApiFeatures(mongo, req.query)
       .searchfillter()

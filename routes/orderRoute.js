@@ -11,6 +11,8 @@ router.use(protect);
 
 router.post("/card", permissions("user") , validator.createOrder, controller.createCardOrder);
 
+router.get("/userTours/:user",validator.checkUserId,controller.getOrders)
+
 router.use(permissions("admin"))
 
 router.get("/",controller.getOrders)
