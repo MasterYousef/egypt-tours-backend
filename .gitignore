@@ -1,3 +1,5 @@
-
+.gitattributes
+config.env
+.eslintrc.json
 node_modules
 .vscode
