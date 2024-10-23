@@ -17,8 +17,8 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
   });
   res
     .status(201)
-    .cookie("user", data, { httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
-    .cookie("token", token, { httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
+    .cookie("user", data, { domain:process.env.FRONT_URL, httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
+    .cookie("token", token, { domain:process.env.FRONT_URL,httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
     .json({ status: "success", data, token });
 });
 
@@ -34,8 +34,8 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
       });
       res
         .status(200)
-        .cookie("user", data, { httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
-        .cookie("token", token, { httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
+        .cookie("user", data, {domain:process.env.FRONT_URL, httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
+        .cookie("token", token, {domain:process.env.FRONT_URL, httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
         .json({ status: "success", data, token });
     } else {
       next(new AppError("email or password are wrong", 404));
