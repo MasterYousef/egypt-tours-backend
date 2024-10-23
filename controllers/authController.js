@@ -15,11 +15,17 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
   const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
+  const cookieOptions = {
+    domain: process.env.FRONT_URL,
+    httpOnly: false,
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite : "None"
+  };
   res
     .status(201)
-    .cookie("user", data, { domain:process.env.FRONT_URL, httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
-    .cookie("token", token, { domain:process.env.FRONT_URL,httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
-    .json({ status: "success", data, token });
+    .cookie("user", data , cookieOptions)
+    .cookie("token", token, cookieOptions)
+    .json({ status: "success" });
 });
 
 exports.login = expressAsyncHandler(async (req, res, next) => {
@@ -32,11 +38,17 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
       const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
         expiresIn: process.env.JWT_EXPIRE,
       });
+      const cookieOptions = {
+        domain: process.env.FRONT_URL,
+        httpOnly: false,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite : "None"
+      };
       res
         .status(200)
-        .cookie("user", data, {domain:process.env.FRONT_URL, httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
-        .cookie("token", token, {domain:process.env.FRONT_URL, httpOnly: false, maxAge: 24 * 60 * 60 * 1000 })
-        .json({ status: "success", data, token });
+        .cookie("user", data , cookieOptions)
+        .cookie("token", token, cookieOptions)
+        .json({ status: "success" });
     } else {
       next(new AppError("email or password are wrong", 404));
     }
@@ -117,7 +129,12 @@ exports.resetCode = expressAsyncHandler(async (req, res, next) => {
       data.passwordReset = true;
       data.passwordResetToken = null;
       await data.save();
-      res.status(200).json({ status: "success" , message:"The code has been added successfully" });
+      res
+        .status(200)
+        .json({
+          status: "success",
+          message: "The code has been added successfully",
+        });
     } else {
       next(new AppError("the code is wrong or expire", 400));
     }
