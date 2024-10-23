@@ -7,7 +7,8 @@ const emailMiddleware = require("../middlewares/emailMiddleware");
 
 const cookieOptions = {
   domain: process.env.FRONT_URL,
-  httpOnly: false,
+  secure:false,
+  httpOnly: true,
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
   sameSite : "None"
 };
