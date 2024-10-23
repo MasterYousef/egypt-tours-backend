@@ -7,10 +7,10 @@ const emailMiddleware = require("../middlewares/emailMiddleware");
 
 const cookieOptions = {
   domain: process.env.FRONT_URL,
-  secure:false,
+  // secure:false,
   httpOnly: true,
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
-  sameSite : "None"
+  // sameSite : "None"
 };
 
 exports.signUp = expressAsyncHandler(async (req, res, next) => {
