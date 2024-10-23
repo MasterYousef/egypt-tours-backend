@@ -5,6 +5,13 @@ const user = require("../models/userModel");
 const AppError = require("../config/appError");
 const emailMiddleware = require("../middlewares/emailMiddleware");
 
+const cookieOptions = {
+  domain: process.env.FRONT_URL,
+  httpOnly: false,
+  expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
+  sameSite : "None"
+};
+
 exports.signUp = expressAsyncHandler(async (req, res, next) => {
   const data = await user.create({
     username: req.body.username,
@@ -15,12 +22,6 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
   const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
-  const cookieOptions = {
-    domain: process.env.FRONT_URL,
-    httpOnly: false,
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite : "None"
-  };
   res
     .status(201)
     .cookie("user", data , cookieOptions)
@@ -38,12 +39,6 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
       const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
         expiresIn: process.env.JWT_EXPIRE,
       });
-      const cookieOptions = {
-        domain: process.env.FRONT_URL,
-        httpOnly: false,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite : "None"
-      };
       res
         .status(200)
         .cookie("user", data , cookieOptions)
