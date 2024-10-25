@@ -6,7 +6,6 @@ const AppError = require("../config/appError");
 const emailMiddleware = require("../middlewares/emailMiddleware");
 
 const cookieOptions = {
-  domain: process.env.FRONT_URL,
   secure:true,
   httpOnly: true,
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
