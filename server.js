@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === "development") {
 dbconnect(process.env.MONGO_KEY);
 app.use(helmet());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONT_URL,
   credentials: true, 
 }))
 app.use(cookieParser())
