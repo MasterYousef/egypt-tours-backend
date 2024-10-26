@@ -9,7 +9,6 @@ const cookieOptions = {
   secure:true,
   httpOnly: true,
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
-  sameSite : "Strict"
 };
 
 exports.signUp = expressAsyncHandler(async (req, res, next) => {
