@@ -57,6 +57,8 @@ exports.imageModelOptions = (options, file) => {
   const setImage = (doc) => {
     if (doc.image && !doc.image.startsWith(`${process.env.BASE_URL}`)) {
       const imgUrl = `${process.env.BASE_URL}/${file}/${doc.image}`;
+      console.log(process.env.BASE_URL);
+      console.log(imgUrl);
       doc.image = imgUrl;
     }
     if (doc.imageCover && !doc.imageCover.startsWith(`${process.env.BASE_URL}`)){
