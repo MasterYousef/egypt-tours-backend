@@ -93,8 +93,6 @@ exports.imageModelOptions = (options, file) => {
     }
   };
   options.post("init", (doc) => {
-    console.log(process.env.BASE_URL);
-    console.log(doc);
     setImage(doc);
   });
   options.post("save", (doc) => {
