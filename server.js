@@ -18,7 +18,6 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(`app work on ${process.env.NODE_ENV}`);
 }
-console.log(process.env.BASE_URL)
 dbconnect(process.env.MONGO_KEY);
 app.use(helmet());
 app.use(cors({
