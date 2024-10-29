@@ -60,7 +60,7 @@ exports.changePassword = expressAsyncHandler(async (req, res, next) => {
       data.password = password;
       data.passwordChangeAt = Date.now();
       await data.save();
-      res.status(200).json({ status: "success", data });
+      res.status(200).json({ status: "success" });
     }
   } else {
     next(new AppError("User not found", 402));
