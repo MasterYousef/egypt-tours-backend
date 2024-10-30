@@ -1,4 +1,3 @@
-const fs = require("fs")
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const path = require("path");
@@ -66,10 +65,6 @@ exports.resizeImage = async (req, res, next, name) => {
 };
 
 exports.resizeMultiImages = async (req, res, next, name) => {
-  const directory = path.join(__dirname, "..", `uploads/${name}`);
-  if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory, { recursive: true });
-  }
   if (req.files.imageCover) {
     const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
     const buffer = await sharp(req.files.imageCover[0].buffer)
