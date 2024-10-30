@@ -1,5 +1,6 @@
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
+const dotenv = require("dotenv");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 const AppError = require("../config/appError");
