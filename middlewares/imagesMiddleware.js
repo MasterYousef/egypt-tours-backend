@@ -1,8 +1,15 @@
-const fs = require("node:fs");
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 const AppError = require("../config/appError");
+
+dotenv.config({ path: "config.env" });
+cloudinary.config({
+  cloud_name: process.env.IMG_NAME,
+  api_key: process.env.IMG_KEY,
+  api_secret: process.env.IMG_SECRET,
+});
 
 const ImageHandler = () => {
   const multerStorge = multer.memoryStorage();
@@ -17,87 +24,112 @@ const ImageHandler = () => {
   return upload;
 };
 
+const uploadToCloudinary = (buffer, folder, filename) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder,
+          public_id: filename.replace(".png", ""),
+          resource_type: "image",
+        },
+        (err, res) => {
+          if (res.secure_url) {
+            resolve(res.secure_url);
+          } else {
+            reject("Invalid image file");
+          }
+        }
+      )
+      .end(buffer);
+  });
+};
+
 exports.resizeImage = async (req, res, next, name) => {
-  const filename = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
+  const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
   if (req.file) {
-    await sharp(req.file.buffer)
+    const file = await sharp(req.file.buffer)
       .resize(600, 600)
       .toFormat("jpeg")
-      .toFile(`images/${name}/${filename}`);
-    req.body.image = filename;
+      .toBuffer();
+    try {
+      const imageUrl = await uploadToCloudinary(buffer, `/${name}`, fileName);
+      req.body.image = imageUrl;
+    } catch (error) {
+      return next(new AppError("Image upload failed", 500));
+    }
   }
-  next()
+  next();
 };
 
 exports.resizeMultiImages = async (req, res, next, name) => {
+  const directory = path.join(__dirname, "..", `uploads/${name}`);
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true });
+  }
   if (req.files.imageCover) {
     const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
-    await sharp(req.files.imageCover[0].buffer)
+    const buffer = await sharp(req.files.imageCover[0].buffer)
       .resize(700, 700)
-      .toFormat("jpeg")
-      .toFile(`images/${name}/${fileName}`);
-    req.body.imageCover = fileName;
+      .toFormat("png")
+      .png({quality:80})
+      .toBuffer();
+    const image = await uploadToCloudinary(buffer, `/${name}`, fileName);
+    req.body.imageCover = image;
   }
   if (req.files.images) {
-     await Promise.all(
+    const data = await Promise.all(
       req.files.images.map(async (e) => {
         const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
-        await sharp(e.buffer)
+        const buffer = await sharp(e.buffer)
           .resize(700, 700)
-          .toFormat("jpeg")
-          .toFile(`images/${name}/${fileName}`);
-        req.body.images.push(fileName)
+          .toFormat("png")
+          .png({quality:80})
+          .toBuffer();
+        const image = await uploadToCloudinary(buffer, `/${name}`, fileName);
+        return image;
       })
     );
+    if (Array.isArray(req.body.images)) {
+      req.body.images = [...req.body.images, ...data];
+    } else if (typeof req.body.images === "string") {
+      data.push(req.body.images);
+      req.body.images = data;
+    }
+    req.body.images = data;
   }
   next();
 };
 
 exports.imageModelOptions = (options, file) => {
-  const setImage = (doc) => {
-    if (doc.image && !doc.image.startsWith(`${process.env.BASE_URL}`)) {
-      const imgUrl = `${process.env.BASE_URL}/${file}/${doc.image}`;
-      doc.image = imgUrl;
-    }
-    if (doc.imageCover && !doc.imageCover.startsWith(`${process.env.BASE_URL}`)){
-      const imgUrl = `${process.env.BASE_URL}/${file}/${doc.imageCover}`;
-      doc.imageCover = imgUrl;
-    }
-    if(doc.images){
-      const data = doc.images.map((e) => {
-        if(!e.startsWith(`${process.env.BASE_URL}`)){
-          e = `${process.env.BASE_URL}/${file}/${e}`;
-        }
-        return e;
-      });
-      doc.images = data;
-    }
-  };
   const removeImage = (doc) => {
-    if (
-      doc.image &&
-      doc.image !== `${process.env.BASE_URL}/user/default.jpeg`
-    ) {
-      const image = doc.image.replace(`${process.env.BASE_URL}/`, "");
-      fs.unlinkSync(`images/${image}`);
+    if (doc.image) {
+      const url = doc.image.split("/");
+      const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
+        ".png",
+        ""
+      );
+      cloudinary.uploader.destroy(image);
     }
     if (doc.imageCover) {
-      const image = doc.imageCover.replace(`${process.env.BASE_URL}/`, "");
-      fs.unlinkSync(`images/${image}`);
+      const url = doc.imageCover.split("/");
+      const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
+        ".png",
+        ""
+      );
+      cloudinary.uploader.destroy(image);
     }
     if (doc.images) {
       doc.images.forEach((e) => {
-        const image = e.replace(`${process.env.BASE_URL}/`, "");
-        fs.unlinkSync(`images/${image}`);
+        const url = e.split("/");
+        const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
+          ".png",
+          ""
+        );
+        cloudinary.uploader.destroy(image);
       });
     }
   };
-  options.post("init", (doc) => {
-    setImage(doc);
-  });
-  options.post("save", (doc) => {
-    setImage(doc);
-  });
   options.post("findOneAndDelete", (doc) => {
     removeImage(doc);
   });

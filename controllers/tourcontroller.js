@@ -1,4 +1,4 @@
-const fs = require('fs');
+const cloudinary = require("cloudinary").v2;
 const expressAsyncHandler = require("express-async-handler");
 const {
   multiImagesHandler,
@@ -16,25 +16,23 @@ exports.updateTour = expressAsyncHandler(async (req, res, next) => {
   if (!data) {
     next(new AppError("id is not valid", 404));
   }
-  if(req.body.imageCover){
-    const image = data.imageCover.replace(`${process.env.BASE_URL}/`, "");
-    fs.unlinkSync(`images/${image}`);
+  if (req.body.imageCover) {
+    cloudinary.uploader.destroy(image);
   }
 
-  if(req.body.images){
-      data.images.forEach((im)=>{
-        if(!req.body.images.includes(im)){
-          const image = im.replace(`${process.env.BASE_URL}/`, "");
-          fs.unlinkSync(`images/${image}`);
-        }
-      })
+  if (req.body.images) {
+    data.images.forEach((im) => {
+      if (!req.body.images.includes(im)) {
+        cloudinary.uploader.destroy(image);
+      }
+    });
   }
   const entries = Object.entries(req.body);
   entries.forEach(([key, value]) => {
-    data[key] = req.body[key]
+    data[key] = req.body[key];
   });
-  await data.save()
-  res.status(200).json({status:"success",data})
+  await data.save();
+  res.status(200).json({ status: "success", data });
 });
 
 exports.getTour = MainController.getOne(tour);
