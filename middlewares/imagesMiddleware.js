@@ -1,5 +1,6 @@
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
+const path = require("path");
 const dotenv = require("dotenv");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
@@ -49,7 +50,7 @@ const uploadToCloudinary = (buffer, folder, filename) => {
 exports.resizeImage = async (req, res, next, name) => {
   const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
   if (req.file) {
-    const file = await sharp(req.file.buffer)
+    const buffer = await sharp(req.file.buffer)
       .resize(600, 600)
       .toFormat("jpeg")
       .toBuffer();
