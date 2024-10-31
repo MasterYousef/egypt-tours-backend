@@ -76,6 +76,13 @@ exports.deleteOne = (model) =>
     res.status(204).send();
   });
 
+  const cookieOptions = {
+    secure:true,
+    httpOnly: true,
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
+  };
+  
+
 exports.updateOne = (model, type) =>
   expressAsyncHandler(async (req, res, next) => {
     if (type === "user") {
@@ -96,7 +103,7 @@ exports.updateOne = (model, type) =>
         data[key] = req.body[key];
       });
       await data.save();
-      res.status(200).cookie("user", data).json({ status: "success", data });
+      res.status(200).cookie("user", data,cookieOptions).json({ status: "success", data });
     } else {
       const data = await model.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
