@@ -91,7 +91,7 @@ exports.updateOne = (model, type) =>
         next(new AppError("id is not valid", 404));
       }
       if (req.body.image) {
-        const url = req.body.image.split("/");
+        const url = data.image.split("/");
         const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
           ".png",
           ""
