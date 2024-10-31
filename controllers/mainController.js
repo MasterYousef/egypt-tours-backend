@@ -1,4 +1,4 @@
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 const expressAsyncHandler = require("express-async-handler");
 const ApiFeatures = require("../utils/ApiFeatures");
 const AppError = require("../config/appError");
@@ -84,10 +84,12 @@ exports.updateOne = (model, type) =>
         next(new AppError("id is not valid", 404));
       }
       if (req.body.image) {
-        if (!data.image.endsWith("default.jpeg")) {
-          const image = data.image.replace(`${process.env.BASE_URL}/`, "");
-          fs.unlinkSync(`images/${image}`);
-        }
+        const url = req.body.image.split("/");
+        const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
+          ".png",
+          ""
+        );
+        cloudinary.uploader.destroy(image);
       }
       const entries = Object.entries(req.body);
       entries.forEach(([key, value]) => {
