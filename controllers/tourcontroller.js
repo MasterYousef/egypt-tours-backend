@@ -17,13 +17,13 @@ exports.updateTour = expressAsyncHandler(async (req, res, next) => {
     next(new AppError("id is not valid", 404));
   }
   if (req.body.imageCover) {
-    cloudinary.uploader.destroy(image);
+    cloudinary.uploader.destroy(data.imageCover);
   }
 
   if (req.body.images) {
     data.images.forEach((im) => {
       if (!req.body.images.includes(im)) {
-        cloudinary.uploader.destroy(image);
+        cloudinary.uploader.destroy(im);
       }
     });
   }

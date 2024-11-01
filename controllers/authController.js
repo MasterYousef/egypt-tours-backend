@@ -6,9 +6,9 @@ const AppError = require("../config/appError");
 const emailMiddleware = require("../middlewares/emailMiddleware");
 
 const cookieOptions = {
-  secure:true,
+  secure: true,
   httpOnly: true,
-  expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
+  expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
 };
 
 exports.signUp = expressAsyncHandler(async (req, res, next) => {
@@ -16,14 +16,14 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
-    image: req.body.image || "default.jpeg",
+    image: req.body.image || "https://res.cloudinary.com/dgka3dogf/image/upload/v1730375378/default_pmuuhg.png",
   });
   const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
   res
     .status(201)
-    .cookie("user", data , cookieOptions)
+    .cookie("user", data, cookieOptions)
     .cookie("token", token, cookieOptions)
     .json({ status: "success" });
 });
@@ -40,7 +40,7 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
       });
       res
         .status(200)
-        .cookie("user", data , cookieOptions)
+        .cookie("user", data, cookieOptions)
         .cookie("token", token, cookieOptions)
         .json({ status: "success" });
     } else {
@@ -60,7 +60,13 @@ exports.changePassword = expressAsyncHandler(async (req, res, next) => {
       data.password = password;
       data.passwordChangeAt = Date.now();
       await data.save();
-      res.status(200).json({ status: "success" });
+      const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
+        expiresIn: process.env.JWT_EXPIRE,
+      });
+      res.status(200)
+      .cookie("user", data, cookieOptions)
+      .cookie("token",token,cookieOptions)
+      .json({ status: "success" });
     }
   } else {
     next(new AppError("User not found", 402));
@@ -123,12 +129,10 @@ exports.resetCode = expressAsyncHandler(async (req, res, next) => {
       data.passwordReset = true;
       data.passwordResetToken = null;
       await data.save();
-      res
-        .status(200)
-        .json({
-          status: "success",
-          message: "The code has been added successfully",
-        });
+      res.status(200).json({
+        status: "success",
+        message: "The code has been added successfully",
+      });
     } else {
       next(new AppError("the code is wrong or expire", 400));
     }

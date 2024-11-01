@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
 const helmet = require("helmet");
@@ -27,7 +26,6 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json({limit:"20mb"}));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
-app.use(express.static(path.join(__dirname, "images")));
 routes(app);
 app.all("*", (req, res, next) => {
   next(new AppError(`can't find this route ${req.originalUrl}`, 404));

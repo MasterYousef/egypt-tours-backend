@@ -20,7 +20,6 @@ exports.hashPassword = async (req, res, next) => {
     next();
   }
 };
-
 exports.createUser = MainController.postOne(user);
 exports.getUsers = MainController.getAll(user);
 exports.updateUser = MainController.updateOne(user,"user");

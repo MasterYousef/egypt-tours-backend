@@ -52,7 +52,7 @@ exports.resizeImage = async (req, res, next, name) => {
   if (req.file) {
     const buffer = await sharp(req.file.buffer)
       .resize(600, 600)
-      .toFormat("jpeg")
+      .toFormat("png")
       .toBuffer();
     try {
       const imageUrl = await uploadToCloudinary(buffer, `/${name}`, fileName);

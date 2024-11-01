@@ -1,4 +1,5 @@
 const cloudinary = require("cloudinary").v2;
+const jwt = require("jsonwebtoken");
 const expressAsyncHandler = require("express-async-handler");
 const ApiFeatures = require("../utils/ApiFeatures");
 const AppError = require("../config/appError");
@@ -7,16 +8,19 @@ const order = require("../models/orderModel");
 exports.getAll = (model) =>
   expressAsyncHandler(async (req, res) => {
     let fillter;
-    let mongo = model.find(fillter)
+    let mongo = model.find(fillter);
     if (req.params.tour) {
       fillter = { tour: req.params.tour };
-      mongo = model.find(fillter).populate("user","_id username image")
+      mongo = model.find(fillter).populate("user", "_id username image");
     }
-    if(req.params.user){
+    if (req.params.user) {
       fillter = { user: req.params.user };
     }
-    if(model === order){
-      mongo = model.find(fillter).populate("tour","title start duration price imageCover people").populate("user","username email")
+    if (model === order) {
+      mongo = model
+        .find(fillter)
+        .populate("tour", "title start duration price imageCover people")
+        .populate("user", "username email");
     }
     const apiFeatures = await new ApiFeatures(mongo, req.query)
       .searchfillter()
@@ -59,9 +63,9 @@ exports.postOne = (Model) =>
 
 exports.getOne = (model) =>
   expressAsyncHandler(async (req, res, next) => {
-    let fillter = {_id:req.params.id}
-    if(req.params.couponName){
-      fillter = {name:req.params.couponName}
+    let fillter = { _id: req.params.id };
+    if (req.params.couponName) {
+      fillter = { name: req.params.couponName };
     }
     const data = await model.findOne(fillter);
     if (!data) {
@@ -76,34 +80,41 @@ exports.deleteOne = (model) =>
     res.status(204).send();
   });
 
-  const cookieOptions = {
-    secure:true,
-    httpOnly: true,
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000) ,
-  };
-  
-
 exports.updateOne = (model, type) =>
   expressAsyncHandler(async (req, res, next) => {
+    const cookieOptions = {
+      secure: true,
+      httpOnly: true,
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    };
     if (type === "user") {
       const data = await model.findOne({ _id: req.params.id });
       if (!data) {
         next(new AppError("id is not valid", 404));
       }
-      if (req.body.image) {
+      if (req.body.image && data.image !== "https://res.cloudinary.com/dgka3dogf/image/upload/v1730375378/default_pmuuhg.png") {
         const url = data.image.split("/");
         const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
           ".png",
           ""
         );
+        console.log(data.image);
+        console.log(image);
         cloudinary.uploader.destroy(image);
       }
       const entries = Object.entries(req.body);
       entries.forEach(([key, value]) => {
         data[key] = req.body[key];
       });
+      const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
+        expiresIn: process.env.JWT_EXPIRE,
+      });
       await data.save();
-      res.status(200).cookie("user", data,cookieOptions).json({ status: "success", data });
+      res
+        .status(200)
+        .cookie("user", data, cookieOptions)
+        .cookie("token", token, cookieOptions)
+        .json({ status: "success" });
     } else {
       const data = await model.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
