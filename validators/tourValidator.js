@@ -17,7 +17,6 @@ exports.postTour = [
     .withMessage("tour max length is 255 letters")
     .isLength({ min: 10 })
     .withMessage("tour minimum length is 10 letters"),
-  check("imageCover").notEmpty().withMessage("tour image Cover is required"),
   check("images")
     .optional()
     .notEmpty()
@@ -81,10 +80,6 @@ exports.updateTour = [
     .withMessage("tour max length is 255 letters")
     .isLength({ min: 10 })
     .withMessage("tour minimum length is 10 letters"),
-  check("imageCover")
-    .optional()
-    .notEmpty()
-    .withMessage("tour image Cover is required"),
   check("images")
     .optional()
     .notEmpty()

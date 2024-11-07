@@ -32,10 +32,12 @@ const schema = new mongoose.Schema({
   maxPeople: {
     type: Number,
     required: [true, "max people in tour is required"],
+    min: [1, "minimum tour people is 1"],
   },
   guides: {
     type: Number,
     required: [true, "Number of guides in tour is required"],
+    min: [1, "minimum tour guides is 1"],
   },
   start: {
     type: Date,

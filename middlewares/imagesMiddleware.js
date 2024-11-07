@@ -48,7 +48,7 @@ const uploadToCloudinary = (buffer, folder, filename) => {
 };
 
 exports.resizeImage = async (req, res, next, name) => {
-  const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
+  const fileName = `${name}-${uuidv4()}-${Date.now()}`;
   if (req.file) {
     const buffer = await sharp(req.file.buffer)
       .resize(600, 600)
@@ -66,7 +66,7 @@ exports.resizeImage = async (req, res, next, name) => {
 
 exports.resizeMultiImages = async (req, res, next, name) => {
   if (req.files.imageCover) {
-    const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
+    const fileName = `${name}-${uuidv4()}-${Date.now()}`;
     const buffer = await sharp(req.files.imageCover[0].buffer)
       .resize(700, 700)
       .toFormat("png")
@@ -76,9 +76,9 @@ exports.resizeMultiImages = async (req, res, next, name) => {
     req.body.imageCover = image;
   }
   if (req.files.images) {
-    const data = await Promise.all(
+    let data = await Promise.all(
       req.files.images.map(async (e) => {
-        const fileName = `${name}-${uuidv4()}-${Date.now()}.jpeg`;
+        const fileName = `${name}-${uuidv4()}-${Date.now()}`;
         const buffer = await sharp(e.buffer)
           .resize(700, 700)
           .toFormat("png")
@@ -89,7 +89,7 @@ exports.resizeMultiImages = async (req, res, next, name) => {
       })
     );
     if (Array.isArray(req.body.images)) {
-      req.body.images = [...req.body.images, ...data];
+      data = [...req.body.images, ...data];
     } else if (typeof req.body.images === "string") {
       data.push(req.body.images);
       req.body.images = data;

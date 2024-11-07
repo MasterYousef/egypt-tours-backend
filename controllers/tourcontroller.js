@@ -8,7 +8,7 @@ const tour = require("../models/tourModel");
 const MainController = require("./mainController");
 const AppError = require("../config/appError");
 
-exports.postTour = MainController.postOne(tour);
+exports.postTour = MainController.postOne(tour, "tour");
 exports.getTours = MainController.getAll(tour);
 
 exports.updateTour = expressAsyncHandler(async (req, res, next) => {
@@ -16,16 +16,20 @@ exports.updateTour = expressAsyncHandler(async (req, res, next) => {
   if (!data) {
     next(new AppError("id is not valid", 404));
   }
-  if (req.body.imageCover) {
-    cloudinary.uploader.destroy(data.imageCover);
-  }
-
   if (req.body.images) {
     data.images.forEach((im) => {
+      console.log(im);
+      console.log(req.body.images.includes(im));
       if (!req.body.images.includes(im)) {
-        cloudinary.uploader.destroy(im);
+        const url = im.split("/");
+        const image = `${url[url.length - 2]}/${url[url.length - 1]}`.replace(
+          ".png",
+          ""
+        );
+        cloudinary.uploader.destroy(image);
       }
     });
+    data.imageCover = req.body.images[0];
   }
   const entries = Object.entries(req.body);
   entries.forEach(([key, value]) => {

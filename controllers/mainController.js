@@ -55,8 +55,11 @@ exports.getAll = (model) =>
     res.status(200).json({ status: "success", result, paginationResult, data });
   });
 
-exports.postOne = (Model) =>
-  expressAsyncHandler(async (req, res) => {
+exports.postOne = (Model,type) =>
+  expressAsyncHandler(async (req, res) => {    
+    if(type === "tour"){
+      req.body.imageCover = Array.isArray(req.body.images) ? req.body.images[0] : req.body.images;
+    }
     const data = await Model.create(req.body);
     res.status(201).json({ status: "success", data: data });
   });
@@ -98,8 +101,6 @@ exports.updateOne = (model, type) =>
           ".png",
           ""
         );
-        console.log(data.image);
-        console.log(image);
         cloudinary.uploader.destroy(image);
       }
       const entries = Object.entries(req.body);
