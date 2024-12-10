@@ -5,7 +5,7 @@ const order = require("../models/orderModel");
 const AppError = require("../config/appError");
 const tour = require("../models/tourModel");
 
-exports.getOrders = MainController.getAll(order);
+exports.getOrders = MainController.getAll(order,"order");
 
 exports.deleteOrder = MainController.deleteOne(order);
 

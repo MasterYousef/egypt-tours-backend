@@ -7,10 +7,8 @@ const {
 const tour = require("../models/tourModel");
 const MainController = require("./mainController");
 const AppError = require("../config/appError");
-
-exports.postTour = MainController.postOne(tour, "tour");
-exports.getTours = MainController.getAll(tour);
-
+exports.postTour = MainController.postOne(tour, "tours");
+exports.getTours = MainController.getAll(tour,"tours");
 exports.updateTour = expressAsyncHandler(async (req, res, next) => {
   const data = await tour.findOne({ _id: req.params.id });
   if (!data) {
@@ -39,8 +37,8 @@ exports.updateTour = expressAsyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data });
 });
 
-exports.getTour = MainController.getOne(tour);
-exports.deleteTour = MainController.deleteOne(tour);
+exports.getTour = MainController.getOne(tour,"tours");
+exports.deleteTour = MainController.deleteOne(tour,"tours");
 exports.tourImageHandler = multiImagesHandler([
   { name: "imageCover", maxCount: 1 },
   { name: "images", maxCount: 5 },

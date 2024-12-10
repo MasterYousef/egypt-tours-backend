@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const user = require("../models/userModel");
 const AppError = require("../config/appError");
 const emailMiddleware = require("../middlewares/emailMiddleware");
+const { client } = require("../config/redisConnect");
 
 const cookieOptions = {
   secure: true,
@@ -16,7 +17,9 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
-    image: req.body.image || "https://res.cloudinary.com/dgka3dogf/image/upload/v1730375378/default_pmuuhg.png",
+    image:
+      req.body.image ||
+      "https://res.cloudinary.com/dgka3dogf/image/upload/v1730375378/default_pmuuhg.png",
   });
   const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
@@ -63,10 +66,13 @@ exports.changePassword = expressAsyncHandler(async (req, res, next) => {
       const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
         expiresIn: process.env.JWT_EXPIRE,
       });
-      res.status(200)
-      .cookie("user", data, cookieOptions)
-      .cookie("token",token,cookieOptions)
-      .json({ status: "success" });
+      client.json.set(`user:${data._id}`, ".", data);
+      client.expire(`user:${data._id}`, process.env.REDIS_EXPIRE);
+      res
+        .status(200)
+        .cookie("user", data, cookieOptions)
+        .cookie("token", token, cookieOptions)
+        .json({ status: "success" });
     }
   } else {
     next(new AppError("User not found", 402));
@@ -78,11 +84,11 @@ exports.protect = expressAsyncHandler(async (req, res, next) => {
     const token = req.headers.authorization.split(" ")[1];
     const jwtData = jwt.verify(token, process.env.JWT_KEY);
     if (jwtData) {
-      const userData = await user.findById(jwtData.userId);
-      if (Date.parse(userData.passwordChangeAt) / 1000 > jwtData.iat) {
-        next(new AppError("password changed please login again", 401));
-      } else {
+      const userData = await client.json.get(`user:${jwtData.userId}`);
+      if (userData) {
         req.user = userData;
+      } else {
+        next(new AppError("User not found", 402));
       }
     } else {
       next(new AppError("token is invalid", 401));

@@ -8,6 +8,7 @@ const dbconnect = require("./config/dbconnect");
 const AppError = require("./config/appError");
 const globalError = require("./middlewares/errorHandler");
 const routes = require("./utils");
+const {redisConnect} = require("./config/redisConnect");
 
 
 const app = express();
@@ -18,6 +19,7 @@ if (process.env.NODE_ENV === "development") {
   console.log(`app work on ${process.env.NODE_ENV}`);
 }
 dbconnect(process.env.MONGO_KEY);
+redisConnect()
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONT_URL,

@@ -1,3 +1,6 @@
+const searchParams = (queryData,type)=>{
+
+}
 class ApiFeatures {
   constructor(mongo, query) {
     this.mongo = mongo;
@@ -5,7 +8,7 @@ class ApiFeatures {
   }
 
   searchfillter() {
-    const query = { ...this.query };
+    const query = { ...this.query};
     const skipWords = ["sort", "keyword", "faild", "limit", "page"];
     if (query.keyword) {
       query.$or = [
@@ -18,8 +21,7 @@ class ApiFeatures {
       /\b(gte|gt|lte|lt)\b/g,
       (e) => `$${e}`
     );
-    queryString = JSON.parse(queryString);
-    this.mongo = this.mongo.find(queryString);
+    this.mongo = this.mongo.find(JSON.parse(queryString));
     return this;
   }
 

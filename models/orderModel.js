@@ -26,6 +26,14 @@ const schema = new mongoose.Schema({
   },
 });
 
+schema.pre(/^find/, function (next) {
+  this.populate(
+    "tour",
+    "title start duration price imageCover people"
+  ).populate("user", "username email");
+  next();
+});
+
 const order = mongoose.model("order", schema);
 
 module.exports = order;
