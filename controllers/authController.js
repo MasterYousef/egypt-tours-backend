@@ -54,11 +54,7 @@ exports.changePassword = expressAsyncHandler(async (req, res, next) => {
       });
       client.json.set(`user:${data._id}`, ".", data);
       client.expire(`user:${data._id}`, process.env.REDIS_EXPIRE);
-      res
-        .status(200)
-        .cookie("user", data, cookieOptions)
-        .cookie("token", token, cookieOptions)
-        .json({ status: "success" });
+      res.status(200).json({ status: "success", user: data, token });
     }
   } else {
     next(new AppError("User not found", 402));
