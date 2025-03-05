@@ -6,12 +6,6 @@ const AppError = require("../config/appError");
 const emailMiddleware = require("../middlewares/emailMiddleware");
 const { client } = require("../config/redisConnect");
 
-const cookieOptions = {
-  secure: true,
-  httpOnly: true,
-  expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-};
-
 exports.signUp = expressAsyncHandler(async (req, res, next) => {
   const data = await user.create({
     username: req.body.username,
@@ -24,11 +18,7 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
   const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
-  res
-    .status(201)
-    .cookie("user", data, cookieOptions)
-    .cookie("token", token, cookieOptions)
-    .json({ status: "success" });
+  res.status(201).json({ status: "success" });
 });
 
 exports.login = expressAsyncHandler(async (req, res, next) => {
