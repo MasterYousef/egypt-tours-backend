@@ -18,7 +18,7 @@ exports.signUp = expressAsyncHandler(async (req, res, next) => {
   const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
     expiresIn: process.env.JWT_EXPIRE,
   });
-  res.status(201).json({ status: "success" });
+  res.status(201).json({ status: "success", user: data, token });
 });
 
 exports.login = expressAsyncHandler(async (req, res, next) => {
@@ -31,11 +31,7 @@ exports.login = expressAsyncHandler(async (req, res, next) => {
       const token = jwt.sign({ userId: data._id }, process.env.JWT_KEY, {
         expiresIn: process.env.JWT_EXPIRE,
       });
-      res
-        .status(200)
-        .cookie("user", data, cookieOptions)
-        .cookie("token", token, cookieOptions)
-        .json({ status: "success" });
+      res.status(200).json({ status: "success", user: data, token });
     } else {
       next(new AppError("email or password are wrong", 404));
     }
